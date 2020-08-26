@@ -7,6 +7,9 @@ import {
   UsePipes,
   Query,
   Get,
+  Param,
+  Patch,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { Task } from './task.entity';
@@ -15,6 +18,8 @@ import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/auth/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { FilterTasksDto } from './dto/filter-task.dto';
+import { ValidateTaskStatus } from './pipes/validate-task-status.pipe';
+import { TaskStatus } from './task-status.enum';
 
 @Controller('tasks')
 @UseGuards(AuthGuard())
@@ -36,5 +41,22 @@ export class TaskController {
     @GetUser() user: User,
   ): Promise<Task[]> {
     return this.taskService.getTasks(filterTasksDto, user);
+  }
+
+  @Get(':id')
+  getTaskById(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
+  ): Promise<Task> {
+    return this.taskService.getTaskById(id, user);
+  }
+
+  @Patch(':id/status')
+  updateTaskStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('status', ValidateTaskStatus) status: TaskStatus,
+    @GetUser() user: User,
+  ): Promise<Task> {
+    return this.taskService.updateTaskStatus(id, status, user);
   }
 }
