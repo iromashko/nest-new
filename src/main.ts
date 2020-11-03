@@ -10,6 +10,10 @@ async function bootstrap() {
   const options = new DocumentBuilder()
     .setTitle('Task Management API')
     .setVersion('1.0.0')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'Token' },
+      'access-token',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
